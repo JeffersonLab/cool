@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="8.0">
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/CDRListener.java">
+</file>
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/ClasDataTypes.java">
+</file>
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/ClasEngineException.java">
+</file>
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/ClasServiceConstants.java">
+</file>
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/ClasServiceEngine.java">
+</file>
+<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/util/TimerFlag.java">
+</file>
+</checkstyle>
