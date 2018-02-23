@@ -33,27 +33,29 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.*;
 
+/**
+ * Control Oriented Ontology Language parser.
+ * This class is used by afecs-4.0.
+ *
+ * @author gurjyan
+ * @date 02.23.18
+ *
+ */
 public class CParser {
     // Jena model
     private Model Gmodel;
 
     // List of the included cool configuration file jena models
-    private HashMap<String, Model> includeModeles = new HashMap<>();
+    private HashMap<String, Model> includeModels = new HashMap<>();
 
-    // Singleton object. Get system const variables, (reads setup.xml).
-    private AConfig myConfig = AConfig.getInstance();
-
-    // Cool  top level configuration files directory
-    private String _coolHome = myConfig.getCoolHome() + File.separator + myConfig.getPlatformExpid() + 
-            File.separator + "config" + File.separator;
+    // Cool  top level run configuration files directory
+    private String _runConfigDir;
 
     // Cool  top level configuration files directory
-    private String _userConfigDir = myConfig.getCoolHome() + File.separator + myConfig.getPlatformExpid() + 
-            File.separator + "user" + File.separator;
+    private String _userConfigDir;
 
     // default option directories for the control
     private Set<String> _opDirs = new HashSet<>();
-
 
     // this is passed by the rcGui rtv table set by the user at the run time.
     private Map<String, String> setRTVs;
@@ -62,13 +64,19 @@ public class CParser {
     private int erId = -1, pebId = -1, sebId = -1, ebId = -1, cdebId = -1, dcId = -1;
 
 
-    public CParser(Map<String, String> usrSetRTVs) {
+    public CParser(String coolHome, String expid, Map<String, String> usrSetRTVs) {
+
+        _runConfigDir = coolHome + File.separator + expid +
+                File.separator + "config" + File.separator;
+
+        _userConfigDir = coolHome + File.separator + expid +
+                File.separator + "user" + File.separator;
+
         if (usrSetRTVs != null) {
             this.setRTVs = usrSetRTVs;
         } else {
             setRTVs = new HashMap<>();
         }
-
     }
 
     /**
@@ -80,7 +88,7 @@ public class CParser {
      */
     public boolean openFile(String fileName, boolean debug) {
         boolean stat;
-        stat = createModel(_coolHome + "Control" + File.separator + fileName) && generateFinalModel();
+        stat = createModel(_runConfigDir + "Control" + File.separator + fileName) && generateFinalModel();
         if (stat && debug) printStatements(Gmodel);
         return stat;
     }
@@ -97,7 +105,7 @@ public class CParser {
         erId = pebId = sebId = ebId = cdebId = dcId = -1;
 
 //        default directory for option files
-        String fn = _coolHome + "Control" + File.separator + runType + File.separator + "Options";
+        String fn = _runConfigDir + "Control" + File.separator + runType + File.separator + "Options";
         _opDirs.add(fn);
 
         AControl c = new AControl();
@@ -188,8 +196,8 @@ public class CParser {
         }
 
         // add this model to the model list
-        if (!includeModeles.containsKey(fileName)) {
-            includeModeles.put(fileName, model);
+        if (!includeModels.containsKey(fileName)) {
+            includeModels.put(fileName, model);
         }
 
         // list the statements in the Model
@@ -204,7 +212,7 @@ public class CParser {
                 if ((node.toString().endsWith(".rdf"))) {
                     String incName;
                     if (node.toString().contains(AConstants.COOL_HTTP_BASE)) {
-                        incName = replace(node.toString(), AConstants.COOL_HTTP_BASE, _coolHome);
+                        incName = replace(node.toString(), AConstants.COOL_HTTP_BASE, _runConfigDir);
                     } else {
                         return false;
                     }
@@ -229,11 +237,11 @@ public class CParser {
      */
     private boolean generateFinalModel() {
         boolean stat = false;
-        if (!includeModeles.isEmpty()) {
+        if (!includeModels.isEmpty()) {
             // create union of the jena models
             Gmodel = ModelFactory.createDefaultModel();
-            for (String s : includeModeles.keySet()) {
-                Gmodel = Gmodel.union(includeModeles.get(s));
+            for (String s : includeModels.keySet()) {
+                Gmodel = Gmodel.union(includeModels.get(s));
             }
             stat = true;
         }
