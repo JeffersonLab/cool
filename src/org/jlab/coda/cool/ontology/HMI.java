@@ -1,74 +1,143 @@
-/*
- *   Copyright (c) 2017.  Jefferson Lab (JLab). All rights reserved. Permission
- *   to use, copy, modify, and distribute  this software and its documentation for
- *   governmental use, educational, research, and not-for-profit purposes, without
- *   fee and without a signed licensing agreement.
- *
- *   IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL
- *   INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
- *   OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS
- *   BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *   JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- *   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- *   PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
- *   PROVIDED HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE
- *   MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *   This software was developed under the United States Government license.
- *   For more information contact author at gurjyan@jlab.org
- *   Department of Experimental Nuclear Physics, Jefferson Lab.
- */
 
 package org.jlab.coda.cool.ontology;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * COOL ontology concept: HMI (human machine interface).
+ *
+ * @author gurjyan
+ *         Date: 02.27.18
+ * @version 4.x
+ */
 public class HMI extends AOntologyConcept implements Serializable {
+    private int rowsNumber;
+    private int columnsNumber;
     private String name;
     private String description;
-    private ArrayList<APanel> panel = new ArrayList<APanel>();
     private String isWebBased;
-    private int rowsNumber, columnsNumber;
+    private List<APanel> panels = new ArrayList<>();
 
 
-    public HMI(){
+    /**
+     * Constructor.
+     */
+    public HMI() {
         setOntology("afecs");
         setConceptName("HMI");
         // slot hasName
-        addPrimitiveSlot( "hasName",1,true,"String");
+        addPrimitiveSlot("hasName", 1, true, "String");
         // slot hasColor
-        addPrimitiveSlot( "hasDescription",1,false,"String");
-        addPrimitiveSlot( "isWebBased",1,false,"String");
-        addPrimitiveSlot( "hasRows",1,false,"Integer");
-        addPrimitiveSlot( "hasColumns",1,false,"Integer");
-        addConceptSlot( "hasPanel",2,false,"APanel");
+        addPrimitiveSlot("hasDescription", 1, false, "String");
+        addPrimitiveSlot("isWebBased", 1, false, "String");
+        addPrimitiveSlot("hasRows", 1, false, "Integer");
+        addPrimitiveSlot("hasColumns", 1, false, "Integer");
+        addConceptSlot("hasPanel", 2, false, "APanel");
     }
 
-
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * Get number of rows.
+     *
+     * @return int
+     */
+    public int getRowsNumber() {
+        return rowsNumber;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setPanels(ArrayList<APanel> panel) {
-        this.panel = panel;
-    }
-
-    public void setWebBased(String webBased) {
-        isWebBased = webBased;
-    }
-
-
+    /**
+     * Set number of rows.
+     *
+     * @param rowsNumber int
+     */
     public void setRowsNumber(int rowsNumber) {
         this.rowsNumber = rowsNumber;
     }
 
+    /**
+     * Get number of columns.
+     *
+     * @return int
+     */
+    public int getColumnsNumber() {
+        return columnsNumber;
+    }
+
+    /**
+     * Set number of columns.
+     *
+     * @param columnsNumber int
+     */
     public void setColumnsNumber(int columnsNumber) {
         this.columnsNumber = columnsNumber;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Set name.
+     *
+     * @param name String
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Get description.
+     *
+     * @return String
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Set description.
+     *
+     * @param description String
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * See if this hmi is web sed.
+     *
+     * @return String
+     */
+    public String getWebBased() {
+        return isWebBased;
+    }
+
+    /**
+     * Set this hmi as web based.
+     *
+     * @param isWebBased String
+     */
+    public void setWebBased(String isWebBased) {
+        this.isWebBased = isWebBased;
+    }
+
+    /**
+     * Get list of panels of this hmi.
+     *
+     * @return List of APanel objects
+     */
+    public List<APanel> getPanels() {
+        return panels;
+    }
+
+    /**
+     * Set list of panels for this hmi.
+     *
+     * @param panels List of APanel objects
+     */
+    public void setPanels(List<APanel> panels) {
+        this.panels = panels;
     }
 }

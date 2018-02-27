@@ -1,88 +1,121 @@
-/*
- *   Copyright (c) 2017.  Jefferson Lab (JLab). All rights reserved. Permission
- *   to use, copy, modify, and distribute  this software and its documentation for
- *   governmental use, educational, research, and not-for-profit purposes, without
- *   fee and without a signed licensing agreement.
- *
- *   IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL
- *   INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
- *   OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS
- *   BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *   JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- *   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- *   PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
- *   PROVIDED HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE
- *   MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *   This software was developed under the United States Government license.
- *   For more information contact author at gurjyan@jlab.org
- *   Department of Experimental Nuclear Physics, Jefferson Lab.
- */
 
 package org.jlab.coda.cool.parser;
 
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * COOL ontology concept: condition.
+ *
+ * @author gurjyan
+ *         Date: 02.27.18
+ * @version 4.x
+ */
 public class ACondition {
+
     private String keyWord;
-    private ArrayList<String> conditionalOperators = new ArrayList<String>();
-    private ArrayList<AStatement> conditionalStatements = new ArrayList<AStatement>();
-    private ArrayList<AStatement> actionStatements = new ArrayList<AStatement>();
+    private List<String> conditionalOperators = new ArrayList<>();
+    private List<AStatement> conditionalStatements = new ArrayList<>();
+    private List<AStatement> actionStatements = new ArrayList<>();
 
-
+    /**
+     * Get condition key word.
+     *
+     * @return String
+     */
     public String getKeyWord() {
         return keyWord;
     }
 
+    /**
+     * Set condition key word.
+     *
+     * @param keyWord String
+     */
     public void setKeyWord(String keyWord) {
         this.keyWord = keyWord;
     }
 
-    public ArrayList<String> getConditionalOperators() {
+    /**
+     * Get conditional operators.
+     *
+     * @return List of Strings
+     */
+    public List<String> getConditionalOperators() {
         return conditionalOperators;
     }
 
-    public void setConditionalOperators(ArrayList<String> conditionalOperators) {
+    /**
+     * Set conditional operators.
+     *
+     * @param conditionalOperators List of Strings
+     */
+    public void setConditionalOperators(List<String> conditionalOperators) {
         this.conditionalOperators = conditionalOperators;
     }
 
-    public ArrayList<AStatement> getConditionalStatements() {
+    /**
+     * Get conditional statements.
+     *
+     * @return List of AStatement objects
+     */
+    public List<AStatement> getConditionalStatements() {
         return conditionalStatements;
     }
 
-    public void setConditionalStatements(ArrayList<AStatement> conditionalStatements) {
+    /**
+     * Set conditional statements.
+     *
+     * @param conditionalStatements List of ACondition objects
+     */
+    public void setConditionalStatements(List<AStatement> conditionalStatements) {
         this.conditionalStatements = conditionalStatements;
     }
 
-    public ArrayList<AStatement> getActionStatements() {
+    /**
+     * Get action statements.
+     *
+     * @return List of AStatement objects
+     */
+    public List<AStatement> getActionStatements() {
         return actionStatements;
     }
 
-    public void setActionStatements(ArrayList<AStatement> actionStatements) {
+    /**
+     * Set action statements.
+     *
+     * @param actionStatements List of AStatement objects
+     */
+    public void setActionStatements(List<AStatement> actionStatements) {
         this.actionStatements = actionStatements;
     }
 
-    public String toString(){
-        StringBuffer sb= new StringBuffer();
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
         sb.append(keyWord).append("\n");
         AStatement stmt;
-        String oper;
-        System.out.println("\n......... New ACondition ..... ");
-        for(int i=0; i< conditionalStatements.size();i++){
+        System.out.println("\n--------- New ACondition -------- ");
+        for (int i = 0; i < conditionalStatements.size(); i++) {
             stmt = conditionalStatements.get(i);
-            sb.append(stmt.getLeft()).append(" ").
-                    append(stmt.getActionOperator()).append(" ").append(stmt.getRight());
-            sb.append("\n");
-            if(i<conditionalOperators.size()){
+            sb.append(stmt.getLeft())
+                    .append(" ")
+                    .append(stmt.getActionOperator())
+                    .append(" ")
+                    .append(stmt.getRight())
+                    .append("\n");
+            if (i < conditionalOperators.size()) {
                 sb.append(conditionalOperators.get(i)).append("\n");
             }
         }
         for (AStatement actionStatement : actionStatements) {
             stmt = actionStatement;
-            sb.append(" -> ").append(stmt.getLeft()).append(" ").
-                    append(stmt.getActionOperator()).append(" ").append(stmt.getRight());
-            sb.append("\n");
+            sb.append(" -> ").append(stmt.getLeft())
+                    .append(" ")
+                    .append(stmt.getActionOperator())
+                    .append(" ")
+                    .append(stmt.getRight())
+                    .append("\n");
         }
         return sb.toString();
     }

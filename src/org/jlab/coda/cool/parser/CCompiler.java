@@ -1,33 +1,20 @@
-/*
- *   Copyright (c) 2017.  Jefferson Lab (JLab). All rights reserved. Permission
- *   to use, copy, modify, and distribute  this software and its documentation for
- *   governmental use, educational, research, and not-for-profit purposes, without
- *   fee and without a signed licensing agreement.
- *
- *   IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL
- *   INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
- *   OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS
- *   BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *   JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- *   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- *   PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
- *   PROVIDED HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE
- *   MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *   This software was developed under the United States Government license.
- *   For more information contact author at gurjyan@jlab.org
- *   Department of Experimental Nuclear Physics, Jefferson Lab.
- */
 
 package org.jlab.coda.cool.parser;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Cool compiler. Reads COOL statements and compiles it into a control system instructions.
+ *
+ * @author gurjyan
+ *         Date: 02.27.18
+ * @version 4.x
+ */
 public class CCompiler {
     private String code;
     private Pattern openB;
@@ -36,15 +23,15 @@ public class CCompiler {
     private Pattern closeP;
     private Pattern andorSim;
 
-    private LinkedHashMap<Integer, Integer> Scopes = new LinkedHashMap<Integer, Integer>();
-    private LinkedHashMap<Integer, Integer> Conditions = new LinkedHashMap<Integer, Integer>();
-    // local instance of the logger object
+    private LinkedHashMap<Integer, Integer> scopesMap = new LinkedHashMap<>();
+    private LinkedHashMap<Integer, Integer> conditionsMap = new LinkedHashMap<>();
 
     /**
-     * Constructor removes all control characters from the cool rule code
+     * Constructor removes all control characters from the cool rule code.
+     *
      * @param s code of the rule
      */
-    public CCompiler(String s){
+    public CCompiler(String s) {
 //        String s4 = "\\&";
 //        String s5 = "|";
         openB = Pattern.compile("\\{");
@@ -63,24 +50,25 @@ public class CCompiler {
      * the matching brackets and records the beginning and
      * the end of the scope into the HashMap. Next it finds
      * the condition for that scopes.
-     * N.B. no nested scopes are supported.
+     * N.B. NO nested scopes are supported.
+     *
      * @param s input string
      * @return status of the execution
      */
-    public boolean findConditonScope(String s){
-        ArrayList<Integer> openBrackets = new ArrayList<Integer>();
-        ArrayList<Integer> closeBrackets = new ArrayList<Integer>();
+    public boolean findConditonScope(String s) {
+        List<Integer> openBrackets = new ArrayList<>();
+        List<Integer> closeBrackets = new ArrayList<>();
         // Find open brackets
-        Matcher matcher_o = openB.matcher(s);
-        while (matcher_o.find()) {
-            openBrackets.add(matcher_o.end());
+        Matcher matcherO = openB.matcher(s);
+        while (matcherO.find()) {
+            openBrackets.add(matcherO.end());
         }
         // Find close brackets
-        Matcher matcher_c = closeB.matcher(s);
-        while (matcher_c.find()) {
-            closeBrackets.add(matcher_c.end());
+        Matcher matcherC = closeB.matcher(s);
+        while (matcherC.find()) {
+            closeBrackets.add(matcherC.end());
         }
-        if(openBrackets.size()!=closeBrackets.size()){
+        if (openBrackets.size() != closeBrackets.size()) {
             System.out.println("Syntax error: unmatched brackets.");
             return false;
         }
@@ -99,26 +87,26 @@ public class CCompiler {
                     }
                 }
             }
-            Scopes.put(open, c);
+            scopesMap.put(open, c);
             openBrackets.remove(openIndex);
         }
 
         // Find conditional statements
         int i = 0;
         int end = 0;
-        for(int st:Scopes.keySet()){
-            if(i==0){
-                Conditions.put(0,st);
-                end = Scopes.get(st);
+        for (int st : scopesMap.keySet()) {
+            if (i == 0) {
+                conditionsMap.put(0, st);
+                end = scopesMap.get(st);
                 i++;
-            } else{
-                Conditions.put(end,st);
-                end = Scopes.get(st);
+            } else {
+                conditionsMap.put(end, st);
+                end = scopesMap.get(st);
             }
         }
-        if(Scopes.size()!= Conditions.size()){
-            System.out.println("Syntax error: scope without a condition \n" +
-                    "or condition without a scopes");
+        if (scopesMap.size() != conditionsMap.size()) {
+            System.out.println("Syntax error: scope without a condition \n"
+                    + "or condition without a scopes");
             return false;
         }
         return true;
@@ -126,81 +114,83 @@ public class CCompiler {
 
     /**
      * Finds conditional statement limits.
+     *
      * @param s condition string to be analyzed
-     * @return map of all conditional statents limits or null if syntax error
+     * @return map of all conditional statements limits or null if syntax error
      */
-    public LinkedHashMap<Integer, Integer> findConditionalStatements(String s){
+    public LinkedHashMap<Integer, Integer> findConditionalStatements(String s) {
 
-        LinkedHashMap<Integer, Integer> CondStatements = new LinkedHashMap<Integer, Integer>();
+        LinkedHashMap<Integer, Integer> condStatementsMap = new LinkedHashMap<>();
 
-        ArrayList<Integer> openParenthesis = new ArrayList<Integer>();
-        ArrayList<Integer> closeParenthesis = new ArrayList<Integer>();
+        List<Integer> openParenthesis = new ArrayList<>();
+        List<Integer> closeParenthesis = new ArrayList<>();
         // Find open parentheses
-        Matcher matcher_o = openP.matcher(s);
-        while (matcher_o.find()) {
-            openParenthesis.add(matcher_o.end());
+        Matcher matcherO = openP.matcher(s);
+        while (matcherO.find()) {
+            openParenthesis.add(matcherO.end());
         }
         // Find close parentheses
-        Matcher matcher_c = closeP.matcher(s);
-        while (matcher_c.find()) {
-            closeParenthesis.add(matcher_c.end());
+        Matcher matcherC = closeP.matcher(s);
+        while (matcherC.find()) {
+            closeParenthesis.add(matcherC.end());
         }
-        if(openParenthesis.size()!=closeParenthesis.size()){
+        if (openParenthesis.size() != closeParenthesis.size()) {
             System.out.println("Syntax error! unmatched parenthesis.");
             return null;
         }
 
         // Find statement limits using pointers for opening and closing parenthesis.
-        for(int c:closeParenthesis){
+        for (int c : closeParenthesis) {
             int size = 1111111;
             int open = 0;
             int openIndex = 0;
-            for(int i=0;i<openParenthesis.size();i++){
+            for (int i = 0; i < openParenthesis.size(); i++) {
                 int o = openParenthesis.get(i);
-                if(c-o>0){
-                    if((c-o)<size){
-                        size = c-o;
+                if (c - o > 0) {
+                    if ((c - o) < size) {
+                        size = c - o;
                         open = o;
                         openIndex = i;
                     }
                 }
             }
-            CondStatements.put(open-1,c+1);
+            condStatementsMap.put(open - 1, c + 1);
             openParenthesis.remove(openIndex);
         }
-        return CondStatements;
+        return condStatementsMap;
     }
 
 
     /**
-     * Finds AND or OR boolean operators (& |)
+     * Finds AND or OR boolean operators (& |).
+     *
      * @param s input string of a condition
      * @return map containing key = index of the operator and value = operator
      */
-    public LinkedHashMap<Integer,String> findConditionalOperators(String s){
-        LinkedHashMap<Integer,String> aos = new LinkedHashMap<Integer,String>();
+    public LinkedHashMap<Integer, String> findConditionalOperators(String s) {
+        LinkedHashMap<Integer, String> aos = new LinkedHashMap<Integer, String>();
         // Find && operators
-        Matcher matcher_o = andorSim.matcher(s);
-        while (matcher_o.find()) {
-            aos.put(matcher_o.end(),matcher_o.group());
+        Matcher matcherO = andorSim.matcher(s);
+        while (matcherO.find()) {
+            aos.put(matcherO.end(), matcherO.group());
         }
         return aos;
     }
 
     /**
-     * get conditional key word of a condition
+     * Get conditional key word of a condition.
      *
      * @param s input string of a condition
      * @return conditional keyword ( if, else, while elseif), null if syntax error
      */
-    public String getConditionalKeyWord(String s){
-        if(s.startsWith("if")){
+    public String getConditionalKeyWord(String s) {
+        if (s.startsWith("if")) {
             return "if";
-        } else if(s.startsWith("elseif")){
+        } else if (s.startsWith("elseif")) {
             return "elseif";
-        } else if(s.startsWith("else")){
+        } else if (s.startsWith("else")) {
             return "else";
-        } else if(s.startsWith("while")){
+        } else if (s.startsWith("while")) {
             return "while";
         } else {
             System.out.println("Syntax error: ACondition without a conditional operator");
@@ -209,23 +199,25 @@ public class CCompiler {
     }
 
     /**
-     * Simple check if the coded description ends with the curly bracket
+     * Simple check if the coded description ends with the curly bracket.
+     *
      * @param s string codded using COOL state machine description language
-     * @return  true or false
+     * @return true or false
      */
-    public boolean checkLastBrase(String s){
+    public boolean checkLastBrase(String s) {
         return s.substring(s.lastIndexOf("}")).trim().equals("}");
     }
 
     /**
-     * Parses conditional or action statements
+     * Parses conditional or action statements.
+     *
      * @param s statement string
      * @return AStatement object
      */
-    public AStatement parseStatement(String s){
+    public AStatement parseStatement(String s) {
         AStatement st = new AStatement();
         StringTokenizer stk = new StringTokenizer(s);
-        switch(stk.countTokens()){
+        switch (stk.countTokens()) {
             case 2:
                 st.setActionOperator(stk.nextToken());
                 st.setRight(stk.nextToken());
@@ -236,23 +228,24 @@ public class CCompiler {
                 st.setRight(stk.nextToken());
                 break;
             default:
-                System.out.println("Syntax error: Malformed statement\n statement = "+s);
+                System.out.println("Syntax error: Malformed statement\n statement = " + s);
                 return null;
         }
         return st;
     }
 
     /**
-     * Parses string containing mutiple statements, separated by the ;
+     * Parses string containing multiple statements, separated by the ";".
+     *
      * @param s input string
-     * @return  ArrayList of AStatement objects
+     * @return ArrayList of AStatement objects
      */
-    public ArrayList<AStatement> parseStatements(String s){
+    public ArrayList<AStatement> parseStatements(String s) {
         ArrayList<AStatement> al = new ArrayList<AStatement>();
-        StringTokenizer stk = new StringTokenizer(s,";");
-        while(stk.hasMoreTokens()){
+        StringTokenizer stk = new StringTokenizer(s, ";");
+        while (stk.hasMoreTokens()) {
             AStatement stmt = parseStatement(stk.nextToken());
-            if(stmt!=null){
+            if (stmt != null) {
                 al.add(stmt);
             } else {
                 return null;
@@ -262,40 +255,41 @@ public class CCompiler {
     }
 
     /**
-     * Parses the string codded using COOL state machine description language
-     * @return arraylist of ACondition objects
+     * Parses the string codded using COOL state machine description language.
+     *
+     * @return list of ACondition objects
      */
-    public ArrayList<ACondition> compile(){
+    public ArrayList<ACondition> compile() {
         // check the last brase
-        if(!checkLastBrase(code)){
+        if (!checkLastBrase(code)) {
             System.out.println("Sintax error: missing the last brase");
             return null;
         }
 
         // find pointers for conditions and related scopes
-        if(!findConditonScope(code)) {
+        if (!findConditonScope(code)) {
             return null;
         }
 
 
         //Using scope pointers retrieve contents of the scopes
         ArrayList<String> scopes = new ArrayList<String>();
-        for(int p:Scopes.keySet()){
-            String scope = code.substring(p,Scopes.get(p)-1);
+        for (int p : scopesMap.keySet()) {
+            String scope = code.substring(p, scopesMap.get(p) - 1);
             scopes.add(scope.trim());
         }
 
 
         //Using condition pointers retrieve contents of the conditions
         ArrayList<ACondition> conditions = new ArrayList<ACondition>();
-        for(int p:Conditions.keySet()){
+        for (int p : conditionsMap.keySet()) {
             ACondition tCond = new ACondition();
             // get the first condition
-            String cndstmt = code.substring(p,Conditions.get(p)-1);
+            String cndstmt = code.substring(p, conditionsMap.get(p) - 1);
 
             // get conditional key word
             String condkeyw = getConditionalKeyWord(cndstmt.trim());
-            if(condkeyw!=null){
+            if (condkeyw != null) {
                 tCond.setKeyWord(condkeyw.trim());
             } else {
                 return null;
@@ -303,6 +297,7 @@ public class CCompiler {
 
             // First get the pointers of the conditional statements
             LinkedHashMap<Integer, Integer> pCondStmt = findConditionalStatements(cndstmt);
+
             // First find the pointers of the operators
             LinkedHashMap<Integer, String> aomap = findConditionalOperators(cndstmt);
 
@@ -310,16 +305,17 @@ public class CCompiler {
             // Conditional statement can have multiple boolean operators. In that case additional
             // pair of parenthesis will be used, making one more "statement".
             // Remember that conditional statement is a string between parenthesis.
-            int z = pCondStmt.size()-aomap.size();
-            int j=0;
-            // find if we need to remove the last conditional statement which is 
-            // not actual statement but container statement
-            switch(z){
+            int z = pCondStmt.size() - aomap.size();
+            int j = 0;
+
+//            find if we need to remove the last conditional statement which is
+//            not actual statement but container statement
+            switch (z) {
                 case 1:
-                    j=pCondStmt.size();
+                    j = pCondStmt.size();
                     break;
                 case 2:
-                    j=pCondStmt.size()-1;
+                    j = pCondStmt.size() - 1;
                     break;
                 default:
                     System.out.println("Syntax error: Malformed boolean statement");
@@ -328,12 +324,12 @@ public class CCompiler {
 
             //Find conditional statements.
             ArrayList<AStatement> condStatements = new ArrayList<AStatement>();
-            for(int sp:pCondStmt.keySet()){
-                if(j>0){
-                    String stmt = cndstmt.substring(sp+1, pCondStmt.get(sp)-2);
+            for (int sp : pCondStmt.keySet()) {
+                if (j > 0) {
+                    String stmt = cndstmt.substring(sp + 1, pCondStmt.get(sp) - 2);
                     // parse the conditional statement
                     AStatement tStmt = parseStatement(stmt.trim());
-                    if(tStmt!=null){
+                    if (tStmt != null) {
                         condStatements.add(tStmt);
                     } else {
                         return null;
@@ -344,9 +340,9 @@ public class CCompiler {
             tCond.setConditionalStatements(condStatements);
 
             // Get conditional operators.
-            ArrayList<String> operators = new ArrayList<String>();
-            if( aomap!=null && !aomap.isEmpty() ){
-                for(int ind:aomap.keySet()){
+            List<String> operators = new ArrayList<>();
+            if (aomap != null && !aomap.isEmpty()) {
+                for (int ind : aomap.keySet()) {
                     operators.add(aomap.get(ind));
                 }
             }
@@ -356,13 +352,13 @@ public class CCompiler {
         }
 
         // Merge conditions and related scopes together
-        if(conditions.size()!=scopes.size()){
+        if (conditions.size() != scopes.size()) {
             System.out.println("Syntax error...");
             return null;
         } else {
-            for(int i=0; i<conditions.size();i++){
+            for (int i = 0; i < conditions.size(); i++) {
                 ArrayList<AStatement> tStmts = parseStatements(scopes.get(i));
-                if(tStmts!=null){
+                if (tStmts != null) {
                     conditions.get(i).setActionStatements(tStmts);
                 } else {
                     return null;
@@ -372,21 +368,27 @@ public class CCompiler {
         return conditions;
     }
 
+    /**
+     * Main method for debugging purposes.
+     *
+     * @param args array of Strings
+     */
+    public static void main(String[] args) {
 
-
-    public static void main(String[] args){
-
-        String s = " if " +
-                "((EB1 in_state EBState1)&& " +
-                "(HVMainFrame not_in_state HVState1)||(HVMainFrame in_state HVState4)){" +
-                "EB1 move_to EBState2;" +
-                "do externalprocess1;}elseif ( HVMainframe in_state HVState1){" +
-                "move_to HVState2;" +
-                "} " +
-                "if(EMU1 in_state EMUState1) { EMU1 moveToState EMUState2 }";
+        String s = " if "
+                + "((EB1 in_state EBState1)&& "
+                + "(HVMainFrame not_in_state HVState1)||(HVMainFrame in_state HVState4)) {"
+                + "EB1 move_to EBState2;"
+                + "do externalprocess1;}elseif ( HVMainframe in_state HVState1) {"
+                + "move_to HVState2;"
+                + "} "
+                + "if (EMU1 in_state EMUState1) { EMU1 moveToState EMUState2 }";
         CCompiler myC = new CCompiler(s);
-        for(ACondition c:myC.compile()){
-            System.out.println(" ... DEBUG ... "+c.getConditionalStatements().size()+" "+c.getConditionalOperators().size());
+        for (ACondition c : myC.compile()) {
+            System.out.println(" ... DEBUG ... "
+                    + c.getConditionalStatements().size()
+                    + " "
+                    + c.getConditionalOperators().size());
             System.out.println(c);
         }
     }

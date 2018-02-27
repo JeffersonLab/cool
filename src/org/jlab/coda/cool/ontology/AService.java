@@ -1,78 +1,179 @@
-/*
- *   Copyright (c) 2017.  Jefferson Lab (JLab). All rights reserved. Permission
- *   to use, copy, modify, and distribute  this software and its documentation for
- *   governmental use, educational, research, and not-for-profit purposes, without
- *   fee and without a signed licensing agreement.
- *
- *   IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL
- *   INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
- *   OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS
- *   BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *   JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- *   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- *   PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
- *   PROVIDED HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE
- *   MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *   This software was developed under the United States Government license.
- *   For more information contact author at gurjyan@jlab.org
- *   Department of Experimental Nuclear Physics, Jefferson Lab.
- */
 
 package org.jlab.coda.cool.ontology;
 
-import org.jlab.coda.cool.util.AConstants;
+import org.jlab.coda.cool.util.CoolConstants;
 
 import java.io.Serializable;
 
+/**
+ * COOL ontology concept: service.
+ *
+ * @author gurjyan
+ *         Date: 02.27.18
+ * @version 4.x
+ */
 public class AService extends AOntologyConcept implements Serializable {
 
-    private String owner                = AConstants.udf;
-    private String name                 = AConstants.udf;
-    private String author               = AConstants.udf;
-    private String version              = AConstants.udf;
-    private String description          = AConstants.udf;
-    private String inputObjectClass     = AConstants.udf;
-    private String outputObjectClass    = AConstants.udf;
+    private String owner = CoolConstants.UDF;
+    private String name = CoolConstants.UDF;
+    private String author = CoolConstants.UDF;
+    private String version = CoolConstants.UDF;
+    private String description = CoolConstants.UDF;
+    private String inputObjectClass = CoolConstants.UDF;
+    private String outputObjectClass = CoolConstants.UDF;
     private ARule stateMachineRule;
 
 
-    public AService(){
-        // this is a concept of org.jlab.coda.afecs.cool.ontology
+    /**
+     * Constructor.
+     */
+    public AService() {
         setOntology("afecs");
         // the name of the concept
         setConceptName("Service");
-        addPrimitiveSlot( "hasName",1,false,"String");
-        addPrimitiveSlot( "hasDescription",1,true,"String");
-        addPrimitiveSlot( "hasOwner",1,true,"String");
-        addConceptSlot( "startsStatemachine",1,true,"ARule");
+        addPrimitiveSlot("hasName", 1, false, "String");
+        addPrimitiveSlot("hasDescription", 1, true, "String");
+        addPrimitiveSlot("hasOwner", 1, true, "String");
+        addConceptSlot("startsStatemachine", 1, true, "ARule");
     }
 
-
-    public String getName() {
-        return name;
+    /**
+     * Get owner of this service.
+     *
+     * @return String
+     */
+    public String getOwner() {
+        return owner;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
+    /**
+     * Set owner of this service.
+     *
+     * @param owner String
+     */
     public void setOwner(String owner) {
         this.owner = owner;
     }
 
+    @Override
+    public String getName() {
+        return name;
+    }
 
+    /**
+     * Set name.
+     *
+     * @param name String
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Get author of this service.
+     *
+     * @return String
+     */
+    public String getAuthor() {
+        return author;
+    }
+
+    /**
+     * Set author of this service.
+     *
+     * @param author String
+     */
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    /**
+     * Get service version.
+     *
+     * @return String
+     */
+    public String getVersion() {
+        return version;
+    }
+
+    /**
+     * Set service version.
+     *
+     * @param version String
+     */
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    /**
+     * Get description.
+     *
+     * @return String
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Set description.
+     *
+     * @param description String
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Get input object class.
+     *
+     * @return String
+     */
+    public String getInputObjectClass() {
+        return inputObjectClass;
+    }
+
+    /**
+     * Set input object class.
+     *
+     * @param inputObjectClass String
+     */
+    public void setInputObjectClass(String inputObjectClass) {
+        this.inputObjectClass = inputObjectClass;
+    }
+
+    /**
+     * Get output object class.
+     *
+     * @return String
+     */
+    public String getOutputObjectClass() {
+        return outputObjectClass;
+    }
+
+    /**
+     * Set ouptput object class.
+     *
+     * @param outputObjectClass String
+     */
+    public void setOutputObjectClass(String outputObjectClass) {
+        this.outputObjectClass = outputObjectClass;
+    }
+
+    /**
+     * Get state machine rule.
+     *
+     * @return ARule object
+     */
     public ARule getStateMachineRule() {
         return stateMachineRule;
     }
 
+    /**
+     * Set state machine rule.
+     *
+     * @param stateMachineRule ARule object.
+     */
     public void setStateMachineRule(ARule stateMachineRule) {
         this.stateMachineRule = stateMachineRule;
     }
-
 }

@@ -1,15 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="8.0">
-<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/CDRListener.java">
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AChannel.java">
 </file>
-<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/ClasDataTypes.java">
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AComponent.java">
 </file>
-<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/ClasEngineException.java">
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AControl.java">
 </file>
-<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/ClasServiceConstants.java">
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/ALink.java">
 </file>
-<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/ClasServiceEngine.java">
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AOntology.java">
 </file>
-<file name="/Users/gurjyan/Devel/clasclara-engine/src/sys/util/TimerFlag.java">
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AOntologyConcept.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AOntologySlot.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AOption.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/APackage.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/APanel.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/APlugin.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AProcess.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/ARule.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AScript.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AService.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AState.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/ASystem.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/AWidget.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/ontology/HMI.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/parser/ACondition.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/parser/AStatement.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/parser/CCompiler.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/parser/CParser.java">
+<error line="1" severity="warning" message="File length is 2,067 lines (max allowed is 2,000)." source="com.puppycrawl.tools.checkstyle.checks.sizes.FileLengthCheck"/>
+<error line="467" column="5" severity="warning" message="Method length is 288 lines (max allowed is 150)." source="com.puppycrawl.tools.checkstyle.checks.sizes.MethodLengthCheck"/>
+<error line="1465" severity="warning" message="Line has trailing spaces." source="com.puppycrawl.tools.checkstyle.checks.regexp.RegexpSinglelineCheck"/>
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/util/CodaTypes.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/util/CoolConstants.java">
+</file>
+<file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/util/CoolTools.java">
 </file>
 </checkstyle>

@@ -1,86 +1,152 @@
-/*
- *   Copyright (c) 2017.  Jefferson Lab (JLab). All rights reserved. Permission
- *   to use, copy, modify, and distribute  this software and its documentation for
- *   governmental use, educational, research, and not-for-profit purposes, without
- *   fee and without a signed licensing agreement.
- *
- *   IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL
- *   INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
- *   OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS
- *   BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *   JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- *   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- *   PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
- *   PROVIDED HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE
- *   MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *   This software was developed under the United States Government license.
- *   For more information contact author at gurjyan@jlab.org
- *   Department of Experimental Nuclear Physics, Jefferson Lab.
- */
 
 package org.jlab.coda.cool.parser;
 
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.QuerySolution;
 
-import com.hp.hpl.jena.query.*;
-import com.hp.hpl.jena.rdf.model.*;
-import org.jlab.coda.cool.ontology.*;
-import org.jlab.coda.cool.util.AConstants;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+
+import org.jlab.coda.cool.ontology.AComponent;
+import org.jlab.coda.cool.ontology.AControl;
+import org.jlab.coda.cool.ontology.AChannel;
+import org.jlab.coda.cool.ontology.ALink;
+import org.jlab.coda.cool.ontology.AOption;
+import org.jlab.coda.cool.ontology.APackage;
+import org.jlab.coda.cool.ontology.APlugin;
+import org.jlab.coda.cool.ontology.APanel;
+import org.jlab.coda.cool.ontology.AProcess;
+import org.jlab.coda.cool.ontology.ARule;
+import org.jlab.coda.cool.ontology.AScript;
+import org.jlab.coda.cool.ontology.AService;
+import org.jlab.coda.cool.ontology.AState;
+import org.jlab.coda.cool.ontology.AWidget;
+import org.jlab.coda.cool.ontology.HMI;
+
+import org.jlab.coda.cool.util.CoolConstants;
+import org.jlab.coda.cool.util.CoolTools;
+import org.jlab.coda.cool.util.CodaTypes;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Control Oriented Ontology Language parser.
  * This class is used by afecs-4.0.
  *
  * @author gurjyan
- * @date 02.23.18
- *
+ *         Date: 02.26.18
+ * @version 4.x
  */
-public class CParser {
-    // Jena model
-    private Model Gmodel;
+public final class CParser {
+    /* Jena model */
+    private Model gModel;
 
     // List of the included cool configuration file jena models
-    private HashMap<String, Model> includeModels = new HashMap<>();
+    private Map<String, Model> includeModels = new HashMap<>();
 
     // Cool  top level run configuration files directory
-    private String _runConfigDir;
+    private String runConfigDir;
 
     // Cool  top level configuration files directory
-    private String _userConfigDir;
+    private String userConfigDir;
 
     // default option directories for the control
-    private Set<String> _opDirs = new HashSet<>();
-
-    // this is passed by the rcGui rtv table set by the user at the run time.
-    private Map<String, String> setRTVs;
+    private Set<String> optionsDirs = new HashSet<>();
 
     private int numberOfFileComponents;
-    private int erId = -1, pebId = -1, sebId = -1, ebId = -1, cdebId = -1, dcId = -1;
+    private int erId = -1;
+    private int pebId = -1;
+    private int sebId = -1;
+    private int ebId = -1;
+    private int cdebId = -1;
+    private int dcId = -1;
 
+    private String cool;
+    private String expid;
+    // this is passed by the rcGui rtv table set by the user at the run time.
+    private Map<String, String> rTVMap = new HashMap<>();
 
-    public CParser(String coolHome, String expid, Map<String, String> usrSetRTVs) {
-
-        _runConfigDir = coolHome + File.separator + expid +
-                File.separator + "config" + File.separator;
-
-        _userConfigDir = coolHome + File.separator + expid +
-                File.separator + "user" + File.separator;
-
-        if (usrSetRTVs != null) {
-            this.setRTVs = usrSetRTVs;
-        } else {
-            setRTVs = new HashMap<>();
-        }
+    private CParser() {
     }
 
     /**
-     * Constructor
+     * Builder for fluent interface.
+     *
+     * @return CParser object
+     */
+    public static CParser builder() {
+        return new CParser();
+    }
+
+    /**
+     * Define cool String.
+     *
+     * @param cool String
+     * @return CParser object
+     */
+    public CParser cool(String cool) {
+        this.cool = cool;
+        return this;
+    }
+
+    /**
+     * Define experiment ID.
+     *
+     * @param expid String
+     * @return CParser object
+     */
+    public CParser expid(String expid) {
+        this.expid = expid;
+        return this;
+    }
+
+    /**
+     * Define real time variable map.
+     *
+     * @param rTVMap rtv map
+     * @return CParser object
+     */
+    public CParser rtv(Map<String, String> rTVMap) {
+        this.rTVMap = rTVMap;
+        return this;
+    }
+
+    /**
+     * The build men=thod of the CParser fluent interface.
+     *
+     * @return CParser object
+     */
+    public CParser build() {
+        runConfigDir = cool + File.separator
+                + expid + File.separator
+                + "config" + File.separator;
+
+        userConfigDir = cool + File.separator
+                + expid + File.separator
+                + "user" + File.separator;
+
+        return this;
+    }
+
+    /**
+     * Constructor.
      *
      * @param fileName of the rdf/cool configuration file
      * @param debug    if true prints statements of the cool description
@@ -88,63 +154,79 @@ public class CParser {
      */
     public boolean openFile(String fileName, boolean debug) {
         boolean stat;
-        stat = createModel(_runConfigDir + "Control" + File.separator + fileName) && generateFinalModel();
-        if (stat && debug) printStatements(Gmodel);
+        stat = createModel(runConfigDir + "Control" + File.separator + fileName) && generateFinalModel();
+        if (stat && debug) {
+            printStatements(gModel);
+        }
         return stat;
     }
 
-
     /**
-     * parses Cool control concept and fills {@link AControl} objet
+     * Parses Cool control concept and fills {@link AControl} object.
      *
-     * @param runType of the control
+     * @param runType        of the control
+     * @param onlyComponents parse only components of a control
      * @return AControl object
      */
     public AControl parseControl(String runType, boolean onlyComponents) {
+        erId = -1;
+        pebId = -1;
+        sebId = -1;
+        ebId = -1;
+        cdebId = -1;
+        dcId = -1;
         numberOfFileComponents = 0;
-        erId = pebId = sebId = ebId = cdebId = dcId = -1;
 
 //        default directory for option files
-        String fn = _runConfigDir + "Control" + File.separator + runType + File.separator + "Options";
-        _opDirs.add(fn);
+        String fn = runConfigDir + "Control" + File.separator + runType + File.separator + "Options";
+        optionsDirs.add(fn);
 
         AControl c = new AControl();
         c.setName(runType);
-        c.setComponents(parseComponent(AConstants.COOL_HTTP_BASE + "Control" +
-                File.separator + runType +
-                File.separator + runType + "#" + runType, "hasComponent"));
+        c.setComponents(parseComponent(CoolConstants.COOL_HTTP_BASE
+                + "Control" + File.separator
+                + runType + File.separator
+                + runType + "#"
+                + runType, "hasComponent"));
 
         if (!onlyComponents) {
 
-            c.setGui(parseHmi(AConstants.COOL_HTTP_BASE + "Control" +
-                    File.separator + runType +
-                    File.separator + runType + "#" + runType, "hasHmi"));
+            c.setGui(parseHmi(CoolConstants.COOL_HTTP_BASE
+                    + "Control" + File.separator
+                    + runType + File.separator
+                    + runType + "#"
+                    + runType, "hasHmi"));
 
-            c.setOption(parseOption(AConstants.COOL_HTTP_BASE + "Control" +
-                    File.separator + runType +
-                    File.separator + runType + "#" + runType, "hasOption"));
+            c.setOption(parseOption(CoolConstants.COOL_HTTP_BASE
+                    + "Control" + File.separator
+                    + runType + File.separator
+                    + runType + "#"
+                    + runType, "hasOption"));
 
 
             // create a supervisor agent for this control
             AComponent duper = new AComponent();
             duper.setName("sms_" + runType);
             duper.setType("SMS");
-            duper.setPriority(ACodaType.SMS.priority());
+            duper.setPriority(CodaTypes.SMS.priority());
 
             // add options to the supervisor agent
             if (c.getOption() != null) {
                 if (c.getOption().getEventLimit() > 0) {
                     duper.setEventLimit(c.getOption().getEventLimit());
                 }
-                if (c.getOption().getDataLimit() > 0) {
-                    //@todo is not implemented for AComponent
-                }
+//                if (c.getOption().getDataLimit() > 0) {
+//                    //@todo is not implemented for AComponent
+//                }
             }
 
             // parse and add described processes for the control to the supervisor agent
-            ArrayList<AProcess> processlist = parseProcess(AConstants.COOL_HTTP_BASE + "Control" +
-                    File.separator + runType +
-                    File.separator + runType + "#" + runType, "hasProcess");
+            List<AProcess> processlist = parseProcess(CoolConstants.COOL_HTTP_BASE
+                    + "Control"
+                    + File.separator + runType
+                    + File.separator + runType
+                    + "#"
+                    + runType, "hasProcess");
 
             if (processlist != null && !processlist.isEmpty()) {
                 duper.setProcesses(processlist);
@@ -159,19 +241,18 @@ public class CParser {
     }
 
     /**
-     * Defines number of streams defined in the configuration
+     * Defines number of streams defined in the configuration.
      *
      * @param comps List of control agents
      */
     private void defineStreams(List<AComponent> comps) {
-//        System.out.println("DDD -----| Info: StreamCount = "+numberOfFileComponents);
         for (AComponent comp : comps) {
             comp.setStreamCount(numberOfFileComponents);
         }
     }
 
     /**
-     * Creates Jena model of the rdf/cool file
+     * Creates Jena model of the rdf/cool file.
      *
      * @param fileName of the rdf/cool configuration file direct path
      * @return stat status of the operation
@@ -182,14 +263,14 @@ public class CParser {
         try {
             fis = new FileInputStream(fileName);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();;
+            e.printStackTrace();
             return false;
         }
 // create the jena model
         Model model = ModelFactory.createDefaultModel();
 
         try {
-            model.read(fis, AConstants.COOL_HTTP_BASE, "RDF/XML");
+            model.read(fis, CoolConstants.COOL_HTTP_BASE, "RDF/XML");
         } catch (Exception ee) {
             ee.printStackTrace();
             return false;
@@ -211,27 +292,28 @@ public class CParser {
             if (node instanceof Resource) {
                 if ((node.toString().endsWith(".rdf"))) {
                     String incName;
-                    if (node.toString().contains(AConstants.COOL_HTTP_BASE)) {
-                        incName = replace(node.toString(), AConstants.COOL_HTTP_BASE, _runConfigDir);
+                    if (node.toString().contains(CoolConstants.COOL_HTTP_BASE)) {
+                        incName = replace(node.toString(), CoolConstants.COOL_HTTP_BASE, runConfigDir);
                     } else {
                         return false;
                     }
                     if (incName.contains("Option")) {
                         String opp = incName.substring(0, incName.lastIndexOf(File.separator));
 
-                        _opDirs.add(opp);
+                        optionsDirs.add(opp);
                     }
                     stat = createModel(incName);
-                    if (!stat) return false;
+                    if (!stat) {
+                        return false;
+                    }
                 }
             }
         }
         return stat;
     }
 
-
     /**
-     * Creates one big jena model including all submodels.
+     * Creates one big jena model including all sub-models.
      *
      * @return stat status of the operation
      */
@@ -239,9 +321,9 @@ public class CParser {
         boolean stat = false;
         if (!includeModels.isEmpty()) {
             // create union of the jena models
-            Gmodel = ModelFactory.createDefaultModel();
+            gModel = ModelFactory.createDefaultModel();
             for (String s : includeModels.keySet()) {
-                Gmodel = Gmodel.union(includeModels.get(s));
+                gModel = gModel.union(includeModels.get(s));
             }
             stat = true;
         }
@@ -249,7 +331,7 @@ public class CParser {
     }
 
     /**
-     * Replaces the substring of the given string with the new string
+     * Replaces the substring of the given string with the new string.
      *
      * @param str     given string
      * @param pattern substring
@@ -270,9 +352,8 @@ public class CParser {
         return result.toString();
     }
 
-
     /**
-     * Debugging method prints all the rdf/cool statements of the model
+     * Debugging method prints all the rdf/cool statements of the model.
      *
      * @param model Jena model object
      */
@@ -307,11 +388,15 @@ public class CParser {
      */
     private String getValue(Object subject, String predicate) {
         Object x = null;
-        String sq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                "> <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String sq = "SELECT ?x "
+                + "WHERE(<" + subject.toString()
+                + "> <" + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(sq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -326,9 +411,10 @@ public class CParser {
         }
         if (x == null) {
             return null;
-        } else return x.toString();
+        } else {
+            return x.toString();
+        }
     }
-
 
     /**
      * Method creates a query from the string and executes it within the
@@ -338,22 +424,29 @@ public class CParser {
      * @param predicate String: cool predicate ( for example has timestamp, hasdatatype, etc.)
      * @return result           string
      */
-    private ArrayList<String> getValueList(Object subject, String predicate) {
+    private List<String> getValueList(Object subject, String predicate) {
         Object x;
-        ArrayList<String> l = new ArrayList<String>();
+        List<String> l = new ArrayList<String>();
 
-        String sq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                "> <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String sq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + "> <"
+                + CoolConstants.COOL_CORE
+                + "" + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(sq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
             if (resultSet.hasNext()) {
                 QuerySolution result = resultSet.nextSolution();
                 x = result.getResource("x");
-                if (x != null) l.add(x.toString());
+                if (x != null) {
+                    l.add(x.toString());
+                }
             }
             qe.close();
 
@@ -362,7 +455,6 @@ public class CParser {
         }
         return l;
     }
-
 
     /**
      * Parsing the component of the control.
@@ -374,22 +466,28 @@ public class CParser {
 
     private ArrayList<AComponent> parseComponent(Object subject, String predicate) {
         AComponent cmp;
-        ArrayList<AProcess> processlist;
-        ArrayList<AState> stateList;
-        ArrayList<AService> services;
+        List<AProcess> processlist;
+        List<AState> stateList;
+        List<AService> services;
         HMI gui;
         APlugin plugin;
         AOption option;
-        ArrayList<ALink> link;
+        List<ALink> link;
         String tmps;
 
         ArrayList<AComponent> cl = new ArrayList<>();
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
 
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -398,7 +496,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
                 cmp = new AComponent();
 
                 tmps = getValue(x, "hasName");
@@ -421,40 +521,38 @@ public class CParser {
 
                 tmps = getValue(x, "hasType");
                 if (tmps != null) {
-                    if (tmps.equals(ACodaType.FILE.name())) {
+                    if (tmps.equals(CodaTypes.FILE.name())) {
                         numberOfFileComponents++;
                         continue;
                     } else {
                         cmp.setType(tmps);
-                        if (tmps.equals(ACodaType.ER.name())) {
+                        if (tmps.equals(CodaTypes.ER.name())) {
                             erId++;
                             cmp.setStreamId(erId);
-                        } else if (tmps.equals(ACodaType.PEB.name())) {
+                        } else if (tmps.equals(CodaTypes.PEB.name())) {
                             pebId++;
                             cmp.setStreamId(pebId);
-                        } else if (tmps.equals(ACodaType.SEB.name())) {
+                        } else if (tmps.equals(CodaTypes.SEB.name())) {
                             sebId++;
                             cmp.setStreamId(sebId);
-                        } else if (tmps.equals(ACodaType.EB.name())) {
+                        } else if (tmps.equals(CodaTypes.EB.name())) {
                             ebId++;
                             cmp.setStreamId(ebId);
-                        } else if (tmps.equals(ACodaType.CDEB.name())) {
+                        } else if (tmps.equals(CodaTypes.CDEB.name())) {
                             cdebId++;
                             cmp.setStreamId(cdebId);
-                        } else if (tmps.equals(ACodaType.DC.name())) {
+                        } else if (tmps.equals(CodaTypes.DC.name())) {
                             dcId++;
                             cmp.setStreamId(dcId);
                         }
                     }
                 }
-
-
                 tmps = getValue(x, "hasID");
                 if (tmps != null) {
                     try {
                         cmp.setId(Integer.valueOf(tmps));
                     } catch (NumberFormatException e) {
-                        e.printStackTrace();;
+                        e.printStackTrace();
                     }
                 }
 
@@ -470,8 +568,8 @@ public class CParser {
 
                 tmps = getValue(x, "hasCode");
                 if (tmps != null) {
-                    if (AfecsTool.containsRTV(tmps)) {
-                        cmp.setCode(AfecsTool.checkRtvs(tmps, setRTVs));
+                    if (CoolTools.containsRTV(tmps)) {
+                        cmp.setCode(CoolTools.checkRtvs(tmps, rTVMap));
                     } else {
                         cmp.setCode(tmps);
                     }
@@ -482,52 +580,58 @@ public class CParser {
                     try {
                         cmp.setPriority(Integer.valueOf(tmps));
                     } catch (NumberFormatException e) {
-                        e.printStackTrace();;
+                        e.printStackTrace();
                     }
                 } else {
-                    if (cmp.getType().equalsIgnoreCase(ACodaType.USR.name())) cmp.setPriority(ACodaType.USR.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.SLC.name()))
-                        cmp.setPriority(ACodaType.SLC.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.WNC.name()))
-                        cmp.setPriority(ACodaType.WNC.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.ER.name()))
-                        cmp.setPriority(ACodaType.ER.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.FCS.name()))
-                        cmp.setPriority(ACodaType.FCS.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.PEB.name()))
-                        cmp.setPriority(ACodaType.PEB.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.SEB.name()))
-                        cmp.setPriority(ACodaType.SEB.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.EB.name()))
-                        cmp.setPriority(ACodaType.EB.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.CDEB.name()))
-                        cmp.setPriority(ACodaType.CDEB.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.DC.name()))
-                        cmp.setPriority(ACodaType.DC.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.ROC.name()))
-                        cmp.setPriority(ACodaType.ROC.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.GT.name()))
-                        cmp.setPriority(ACodaType.GT.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.TS.name()))
-                        cmp.setPriority(ACodaType.TS.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.SMS.name()))
-                        cmp.setPriority(ACodaType.SMS.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.RCS.name()))
-                        cmp.setPriority(ACodaType.RCS.priority());
-                    else if (cmp.getType().equalsIgnoreCase(ACodaType.FILE.name()))
-                        cmp.setPriority(ACodaType.FILE.priority());
-                    else
-                        System.err.println("Error: " + cmp.getType() + " type is not defined for the component " + " " + cmp.getName());
+                    if (cmp.getType().equalsIgnoreCase(CodaTypes.USR.name())) {
+                        cmp.setPriority(CodaTypes.USR.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.SLC.name())) {
+                        cmp.setPriority(CodaTypes.SLC.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.WNC.name())) {
+                        cmp.setPriority(CodaTypes.WNC.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.ER.name())) {
+                        cmp.setPriority(CodaTypes.ER.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.FCS.name())) {
+                        cmp.setPriority(CodaTypes.FCS.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.PEB.name())) {
+                        cmp.setPriority(CodaTypes.PEB.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.SEB.name())) {
+                        cmp.setPriority(CodaTypes.SEB.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.EB.name())) {
+                        cmp.setPriority(CodaTypes.EB.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.CDEB.name())) {
+                        cmp.setPriority(CodaTypes.CDEB.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.DC.name())) {
+                        cmp.setPriority(CodaTypes.DC.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.ROC.name())) {
+                        cmp.setPriority(CodaTypes.ROC.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.GT.name())) {
+                        cmp.setPriority(CodaTypes.GT.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.TS.name())) {
+                        cmp.setPriority(CodaTypes.TS.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.SMS.name())) {
+                        cmp.setPriority(CodaTypes.SMS.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.RCS.name())) {
+                        cmp.setPriority(CodaTypes.RCS.priority());
+                    } else if (cmp.getType().equalsIgnoreCase(CodaTypes.FILE.name())) {
+                        cmp.setPriority(CodaTypes.FILE.priority());
+                    } else {
+                        System.err.println("Error: "
+                                + cmp.getType()
+                                + " type is not defined for the component "
+                                + " "
+                                + cmp.getName());
+                    }
                 }
 
                 tmps = getValue(x, "hasUserConfig");
                 if (tmps != null) {
-                    if (AfecsTool.containsRTV(tmps)) {
-                        cmp.setUserConfig(AfecsTool.checkRtvs(tmps, setRTVs));
+                    if (CoolTools.containsRTV(tmps)) {
+                        cmp.setUserConfig(CoolTools.checkRtvs(tmps, rTVMap));
                     } else if (tmps.startsWith("/")) {
                         cmp.setUserConfig(tmps);
                     } else {
-                        cmp.setUserConfig(_userConfigDir + tmps);
+                        cmp.setUserConfig(userConfigDir + tmps);
                     }
                 }
 
@@ -537,13 +641,15 @@ public class CParser {
                 }
 
                 tmps = getValue(x, "hasRunType");
-                if (tmps != null) cmp.setRunType(tmps);
+                if (tmps != null) {
+                    cmp.setRunType(tmps);
+                }
 
                 option = parseOption(x, "hasOption");
                 if (option != null) {
                     cmp.setOption(option);
-                    for (String s : _opDirs) {
-                        cmp.addDod(s);
+                    for (String s : optionsDirs) {
+                        cmp.addDefaultOptionDir(s);
                     }
                 }
 
@@ -632,7 +738,7 @@ public class CParser {
                     }
                 }
 
-                ArrayList<String> tmL = getValueList(x, "linkedTo");
+                List<String> tmL = getValueList(x, "linkedTo");
                 if (tmL != null && !tmL.isEmpty()) {
                     cmp.setLinkedComponentNames(tmL);
                 }
@@ -647,9 +753,8 @@ public class CParser {
         return cl;
     }
 
-
     /**
-     * Method parses the cool Plugin concept
+     * Method parses the cool Plugin concept.
      *
      * @param subject   object of the cool concept
      * @param predicate String of the cool predicate name
@@ -661,12 +766,18 @@ public class CParser {
         String description;
         String className;
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
 
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -675,7 +786,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
                 plugin = new APlugin();
 
                 name = getValue(x, "hasName");
@@ -709,7 +822,7 @@ public class CParser {
     }
 
     /**
-     * Method parses the cool State concept
+     * Method parses the cool State concept.
      *
      * @param subject   object of the cool concept
      * @param predicate String of the cool predicate name
@@ -719,18 +832,23 @@ public class CParser {
         AState state;
         String name;
         String description;
-        ArrayList<String> compNames;
-        ArrayList<AProcess> processes;
+        List<String> compNames;
+        List<AProcess> processes;
 
 
         ArrayList<AState> states = new ArrayList<>();
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
-
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -739,7 +857,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
 
                 state = new AState();
 
@@ -777,26 +897,38 @@ public class CParser {
     }
 
     /**
-     * parses Cool process concept
+     * Parses Cool process concept.
      *
      * @param subject   object of the cool concept
      * @param predicate String of the cool predicate name
      * @return pl              List of {@link AProcess} objects
      */
-    private ArrayList<AProcess> parseProcess(Object subject, String predicate) {
+    private List<AProcess> parseProcess(Object subject, String predicate) {
         AProcess process;
-        String name, before, after, status, initiator, description, critical, sync;
-        ArrayList<AScript> scripts;
-        ArrayList<APackage> sendPackages;
-        ArrayList<APackage> receivePackages;
+        String name;
+        String before;
+        String after;
+        String status;
+        String initiator;
+        String description;
+        String critical;
+        String sync;
+        List<AScript> scripts;
+        List<APackage> sendPackages;
+        List<APackage> receivePackages;
+        List<AProcess> pl = new ArrayList<>();
         String tmps;
-        ArrayList<AProcess> pl = new ArrayList<>();
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                "> <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + "> <"
+                + CoolConstants.COOL_CORE
+                + "" + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -805,7 +937,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
 
                 process = new AProcess();
 
@@ -903,19 +1037,24 @@ public class CParser {
      * @param predicate of the rdf statement
      * @return AService objects.
      */
-    private ArrayList<AService> parseServices(Object subject, String predicate) {
+    private List<AService> parseServices(Object subject, String predicate) {
         AService service;
-        ArrayList<AService> services = new ArrayList<AService>();
+        List<AService> services = new ArrayList<>();
         String name;
         String description;
         String owner;
         ARule stateMachineRule;
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + "" + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -924,7 +1063,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
 
                 service = new AService();
 
@@ -961,7 +1102,7 @@ public class CParser {
     }
 
     /**
-     * Method parses the cool rule concept
+     * Method parses the cool rule concept.
      *
      * @param subject   object of the cool concept
      * @param predicate String of the cool predicate name
@@ -969,13 +1110,20 @@ public class CParser {
      */
     private ARule parseRule(Object subject, String predicate) {
         ARule rule = null;
-        String name, description, code;
+        String name;
+        String description;
+        String code;
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + "" + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -984,7 +1132,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
 
                 rule = new ARule();
 
@@ -1016,19 +1166,29 @@ public class CParser {
         return rule;
     }
 
-    private ArrayList<ALink>
-
-
-    parseLink(Object subject, String predicate) {
+    /**
+     * Parsing the link.
+     *
+     * @param subject   COOL subject
+     * @param predicate COOL predicate
+     * @return ALink object
+     */
+    private List<ALink> parseLink(Object subject, String predicate) {
         ALink link;
         String tmps;
-        ArrayList<ALink> al = new ArrayList<>();
+        List<ALink> al = new ArrayList<>();
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -1037,7 +1197,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
 
                 link = new ALink();
 
@@ -1151,9 +1313,7 @@ public class CParser {
                     }
                 }
 
-
                 al.add(link);
-
             }
             qe.close();
 
@@ -1164,7 +1324,7 @@ public class CParser {
     }
 
     /**
-     * Method parses the cool option concept
+     * Method parses the cool option concept.
      *
      * @param subject   object of the cool concept
      * @param predicate String of the cool predicate name
@@ -1172,14 +1332,28 @@ public class CParser {
      */
     private AOption parseOption(Object subject, String predicate) {
         AOption option = null;
-        String name, description, dataFile, dataFilePrefix, coda2Component,
-                autoStart, startRun, configFile, configString, tmps;
+        String name;
+        String description;
+        String dataFile;
+        String dataFilePrefix;
+        String coda2Component;
+        String autoStart;
+        String startRun;
+        String configFile;
+        String configString;
+        String tmps;
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -1188,7 +1362,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
                 option = new AOption();
 
                 name = getValue(x, "hasName");
@@ -1287,15 +1463,14 @@ public class CParser {
         return option;
     }
 
-
     /**
-     * Method parses the cool package concept
+     * Method parses the cool package concept.
      *
      * @param subject   object of the cool concept
      * @param predicate String of the cool predicate name
      * @return list of          {@link APackage} objects
      */
-    private ArrayList<APackage> parsePackage(Object subject, String predicate) {
+    private List<APackage> parsePackage(Object subject, String predicate) {
         APackage pk;
         String name;
         String description;
@@ -1303,16 +1478,22 @@ public class CParser {
         String subj;
         String type;
         String text;
-        ArrayList<String> receivedTexts;
-        ArrayList<AChannel> channels;
+        List<String> receivedTexts;
+        List<AChannel> channels;
 
-        ArrayList<APackage> al = new ArrayList<APackage>();
+        List<APackage> al = new ArrayList<>();
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -1321,7 +1502,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
                 pk = new APackage();
 
                 name = getValue(x, "hasName");
@@ -1397,13 +1580,13 @@ public class CParser {
     }
 
     /**
-     * Method parses the cool channel concept
+     * Method parses the cool channel concept.
      *
      * @param subject   object of the cool concept
      * @param predicate String of the cool predicate name
      * @return list of          {@link AChannel} objects
      */
-    private ArrayList<AChannel> parseChannel(Object subject, String predicate) {
+    private List<AChannel> parseChannel(Object subject, String predicate) {
         AChannel ch;
         String name;
         String value;
@@ -1414,13 +1597,19 @@ public class CParser {
         String unit;
         String description;
 
-        ArrayList<AChannel> al = new ArrayList<AChannel>();
+        List<AChannel> al = new ArrayList<>();
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -1429,7 +1618,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
                 ch = new AChannel();
 
                 name = getValue(x, "hasName");
@@ -1489,26 +1680,32 @@ public class CParser {
     }
 
     /**
-     * Method parses the cool script concept
+     * Method parses the cool script concept.
      *
      * @param subject   object of the cool concept
      * @param predicate String of the cool predicate name
      * @return list of          {@link AScript} objects
      */
-    private ArrayList<AScript> parseScript(Object subject, String predicate) {
+    private List<AScript> parseScript(Object subject, String predicate) {
         AScript sc;
         String name;
         String description;
         String commandString;
         String sync;
         String tmp;
-        ArrayList<AScript> al = new ArrayList<>();
+        List<AScript> al = new ArrayList<>();
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -1517,7 +1714,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
                 sc = new AScript();
 
                 name = getValue(x, "hasName");
@@ -1535,8 +1734,8 @@ public class CParser {
 
                 commandString = getValue(x, "hasCommandString");
                 if (commandString != null) {
-                    if (AfecsTool.containsRTV(commandString)) {
-                        sc.setCommandString(AfecsTool.checkRtvs(commandString, setRTVs));
+                    if (CoolTools.containsRTV(commandString)) {
+                        sc.setCommandString(CoolTools.checkRtvs(commandString, rTVMap));
                     } else {
                         sc.setCommandString(commandString);
                     }
@@ -1575,7 +1774,7 @@ public class CParser {
     }
 
     /**
-     * Method parses the cool hmi concept
+     * Method parses the cool hmi concept.
      *
      * @param subject   object of the cool concept
      * @param predicate String of the cool predicate name
@@ -1585,15 +1784,21 @@ public class CParser {
         HMI h = null;
         String name;
         String description;
-        ArrayList<APanel> panels;
         String isWebBased;
         String tmps;
+        List<APanel> panels;
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -1602,7 +1807,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
                 h = new HMI();
 
                 name = getValue(x, "hasName");
@@ -1655,27 +1862,33 @@ public class CParser {
     }
 
     /**
-     * Method parses the cool panel concept
+     * Method parses the cool panel concept.
      *
      * @param subject   object of the cool concept
      * @param predicate String of the cool predicate name
      * @return list of          {@link APanel} objects
      */
-    private ArrayList<APanel> parsePanel(Object subject, String predicate) {
+    private List<APanel> parsePanel(Object subject, String predicate) {
         APanel p;
         String name;
         String description;
         String color;
         String title;
-        ArrayList<AWidget> widgets;
+        List<AWidget> widgets;
+        List<APanel> al = new ArrayList<>();
         String tmps;
-        ArrayList<APanel> al = new ArrayList<APanel>();
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -1684,7 +1897,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
                 p = new APanel();
 
                 name = getValue(x, "hasName");
@@ -1734,13 +1949,13 @@ public class CParser {
     }
 
     /**
-     * Method parses the cool widget concept
+     * Method parses the cool widget concept.
      *
      * @param subject   object of the cool concept
      * @param predicate String of the cool predicate name
      * @return list of          {@link AWidget} objects
      */
-    private ArrayList<AWidget> parseWidget(Object subject, String predicate) {
+    private List<AWidget> parseWidget(Object subject, String predicate) {
         AWidget w;
         String name;
         String description;
@@ -1750,16 +1965,22 @@ public class CParser {
         String subType;
         String icon;
         String editable;
-        ArrayList<AService> actionServices;
-        ArrayList<AProcess> actionProcesses;
-        ArrayList<AState> actionStates;
-        ArrayList<AWidget> al = new ArrayList<AWidget>();
+        List<AService> actionServices;
+        List<AProcess> actionProcesses;
+        List<AState> actionStates;
+        List<AWidget> al = new ArrayList<>();
 
-        String tq = "SELECT ?x " + "WHERE(<" + subject.toString() +
-                ">, <" + AConstants.COOL_CORE + "" + predicate + ">,?x )";
+        String tq = "SELECT ?x "
+                + "WHERE(<"
+                + subject.toString()
+                + ">, <"
+                + CoolConstants.COOL_CORE
+                + ""
+                + predicate
+                + ">,?x )";
         try {
             Query query = QueryFactory.create(tq);
-            QueryExecution qe = QueryExecutionFactory.create(query, Gmodel);
+            QueryExecution qe = QueryExecutionFactory.create(query, gModel);
 
             ResultSet resultSet = qe.execSelect();
 
@@ -1768,7 +1989,9 @@ public class CParser {
                 Object x = result.getResource("x");
 
 
-                if (x == null) break;
+                if (x == null) {
+                    break;
+                }
                 w = new AWidget();
 
                 name = getValue(x, "hasName");
@@ -1841,6 +2064,4 @@ public class CParser {
         }
         return al;
     }
-
-
 }

@@ -1,58 +1,79 @@
-/*
- *   Copyright (c) 2017.  Jefferson Lab (JLab). All rights reserved. Permission
- *   to use, copy, modify, and distribute  this software and its documentation for
- *   governmental use, educational, research, and not-for-profit purposes, without
- *   fee and without a signed licensing agreement.
- *
- *   IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL
- *   INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
- *   OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS
- *   BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *   JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- *   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- *   PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
- *   PROVIDED HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE
- *   MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *   This software was developed under the United States Government license.
- *   For more information contact author at gurjyan@jlab.org
- *   Department of Experimental Nuclear Physics, Jefferson Lab.
- */
 
 package org.jlab.coda.cool.parser;
 
+/**
+ * COOL ontology concept: statement.
+ *
+ * @author gurjyan
+ *         Date: 02.27.18
+ * @version 4.x
+ */
 public class AStatement {
     private String left;
     private String right;
     private String actionOperator;
 
 
+    /**
+     * Get left operand of a statement.
+     *
+     * @return String
+     */
     public String getLeft() {
         return left;
     }
 
+    /**
+     * Set left operand of a statement.
+     *
+     * @param left String
+     */
     public void setLeft(String left) {
         this.left = left;
     }
 
+    /**
+     * Get right operand of a statement.
+     *
+     * @return String
+     */
     public String getRight() {
         return right;
     }
 
+    /**
+     * Set right operand of a statement.
+     *
+     * @param right String
+     */
     public void setRight(String right) {
         this.right = right;
     }
 
+    /**
+     * Get action operator.
+     *
+     * @return String
+     */
     public String getActionOperator() {
         return actionOperator;
     }
 
+    /**
+     * Set action operator.
+     *
+     * @param actionOperator String
+     */
     public void setActionOperator(String actionOperator) {
         this.actionOperator = actionOperator;
     }
 
-    public String toString(){
-        return left + " " + actionOperator + " " + right;
+    @Override
+    public String toString() {
+        return "AStatement{"
+                + "left='" + left + '\''
+                + ", right='" + right + '\''
+                + ", actionOperator='" + actionOperator + '\''
+                + '}';
     }
 }

@@ -1126,7 +1126,7 @@ Fax:   (757) 269-5800             Newport News, VA 23606
     <!--                                            PANEL -->
     <rdfs:Class rdf:ID="Panel">
         <rdfs:label>
-            The panel of the HMI
+            The panels of the HMI
         </rdfs:label>
         <rdfs:comment>
         </rdfs:comment>
@@ -1136,7 +1136,7 @@ Fax:   (757) 269-5800             Newport News, VA 23606
         <rdfs:range rdf:resource="http:/www.w3.org/1999/02/22-rdf-syntax-ns#Literal"/>
         <rdfs:domain rdf:resource="#Panel"/>
         <rdfs:comment>
-            The name of the panel. N.B. HMI can hav e many panels.
+            The name of the panels. N.B. HMI can hav e many panels.
         </rdfs:comment>
     </rdf:Property>
 
@@ -1215,7 +1215,7 @@ Fax:   (757) 269-5800             Newport News, VA 23606
         <rdfs:range rdf:resource="http:/www.w3.org/1999/02/22-rdf-syntax-ns#Integer"/>
         <rdfs:domain rdf:resource="#Widget"/>
         <rdfs:comment>
-            Widget number in the Panel (max 4x4 widgets per panel)
+            Widget number in the Panel (max 4x4 widgets per panels)
         </rdfs:comment>
     </rdf:Property>
 

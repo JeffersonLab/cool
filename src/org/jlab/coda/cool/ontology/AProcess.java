@@ -1,203 +1,351 @@
-/*
- *   Copyright (c) 2017.  Jefferson Lab (JLab). All rights reserved. Permission
- *   to use, copy, modify, and distribute  this software and its documentation for
- *   governmental use, educational, research, and not-for-profit purposes, without
- *   fee and without a signed licensing agreement.
- *
- *   IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL
- *   INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
- *   OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS
- *   BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *   JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- *   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- *   PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
- *   PROVIDED HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE
- *   MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *   This software was developed under the United States Government license.
- *   For more information contact author at gurjyan@jlab.org
- *   Department of Experimental Nuclear Physics, Jefferson Lab.
- */
 
 package org.jlab.coda.cool.ontology;
 
-import org.jlab.coda.cool.util.AConstants;
+import org.jlab.coda.cool.util.CoolConstants;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * COOL ontology concept: process.
+ *
+ * @author gurjyan
+ *         Date: 02.27.18
+ * @version 4.x
+ */
 public class AProcess extends AOntologyConcept implements Serializable {
     private String name;
-    private String before      = AConstants.udf;
-    private String after       = AConstants.udf;
-    private String status      = AConstants.udf;
-    private String initiator   = AConstants.udf;
-    private String description = AConstants.udf;
-    private String critical    = AConstants.setoff;
-    private String sync        = AConstants.setoff;
+    private String before = CoolConstants.UDF;
+    private String after = CoolConstants.UDF;
+    private String status = CoolConstants.UDF;
+    private String initiator = CoolConstants.UDF;
+    private String description = CoolConstants.UDF;
+    private String critical = CoolConstants.FALSE;
+    private String sync = CoolConstants.FALSE;
     private int periodicity;
-    private int delay          = 3;
-    private int timeout        = AConstants.TIMEOUT;
+    private int delay = 3;
+    private int timeout = CoolConstants.TIMEOUT;
     private int requestid;
-    private ArrayList<AScript> scripts = new ArrayList<AScript>();
-    private ArrayList<APackage> sendPackages = new ArrayList<APackage>();
-    private ArrayList<APackage> receivePackages = new ArrayList<APackage>();
+    private List<AScript> scripts = new ArrayList<>();
+    private List<APackage> sendPackages = new ArrayList<>();
+    private List<APackage> receivePackages = new ArrayList<>();
 
-    public AProcess(){
-        // this is a concept of org.jlab.coda.afecs.cool.ontology
+    /**
+     * Constructor.
+     */
+    public AProcess() {
         setOntology("afecs");
         // the name of the concept
         setConceptName("Process");
-        addPrimitiveSlot( "hasName",1,false,"String");
-        addPrimitiveSlot( "hasDescription",1,true,"String");
-        addPrimitiveSlot( "isCritical",1,true,"String");
-        addPrimitiveSlot( "before",1,true,"String");
-        addPrimitiveSlot( "after",1,true,"String");
-        addPrimitiveSlot( "hasIpc",1,true,"String");
-        addPrimitiveSlot( "hasPeriodicity",1,true,"Integer");
-        addPrimitiveSlot( "hasDelay",1,true,"Integer");
-        addPrimitiveSlot( "hasTimeOut",1,true,"Integer");
-        addPrimitiveSlot( "hasRequestId",1,true,"Integer");
-        addPrimitiveSlot( "status",1,true,"String");
-        addPrimitiveSlot( "isInitiator",1,true,"String");
-        addConceptSlot("runs",2,true, "AScript");
-        addConceptSlot("sends",2,true, "APackage");
-        addConceptSlot("receives",2,true, "APackage");
+        addPrimitiveSlot("hasName", 1, false, "String");
+        addPrimitiveSlot("hasDescription", 1, true, "String");
+        addPrimitiveSlot("isCritical", 1, true, "String");
+        addPrimitiveSlot("before", 1, true, "String");
+        addPrimitiveSlot("after", 1, true, "String");
+        addPrimitiveSlot("hasIpc", 1, true, "String");
+        addPrimitiveSlot("hasPeriodicity", 1, true, "Integer");
+        addPrimitiveSlot("hasDelay", 1, true, "Integer");
+        addPrimitiveSlot("hasTimeOut", 1, true, "Integer");
+        addPrimitiveSlot("hasRequestId", 1, true, "Integer");
+        addPrimitiveSlot("status", 1, true, "String");
+        addPrimitiveSlot("isInitiator", 1, true, "String");
+        addConceptSlot("runs", 2, true, "AScript");
+        addConceptSlot("sends", 2, true, "APackage");
+        addConceptSlot("receives", 2, true, "APackage");
     }
 
-
+    @Override
     public String getName() {
         return name;
     }
 
+    /**
+     * Set name.
+     *
+     * @param name String
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * See if process needs to be executed before a state machine transition.
+     *
+     * @return String
+     */
     public String getBefore() {
         return before;
     }
 
+    /**
+     * Set the process to be executed before a state machine transition.
+     *
+     * @param before String
+     */
     public void setBefore(String before) {
         this.before = before;
     }
 
+    /**
+     * See if process needs to be executed after a state machine transition.
+     *
+     * @return String
+     */
     public String getAfter() {
         return after;
     }
 
+    /**
+     * Set the process to be executed after a state machine transition.
+     *
+     * @param after String
+     */
     public void setAfter(String after) {
         this.after = after;
     }
 
+    /**
+     * Get process execution status.
+     *
+     * @return String
+     */
     public String getStatus() {
         return status;
     }
 
+    /**
+     * Set process execution status.
+     *
+     * @param status String
+     */
     public void setStatus(String status) {
         this.status = status;
     }
 
-    public int getPeriodicity() {
-        return periodicity;
+    /**
+     * See if this is an initiator process.
+     *
+     * @return String
+     */
+    public String getInitiator() {
+        return initiator;
     }
 
-    public void setPeriodicity(int periodicity) {
-        this.periodicity = periodicity;
-    }
-
-    public int getDelay() {
-        return delay;
-    }
-
-    public void setDelay(int delay) {
-        this.delay = delay;
-    }
-
-    public int getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
-    public void setRequestid(int requestid) {
-        this.requestid = requestid;
-    }
-
-    public ArrayList<AScript> getScripts() {
-        return scripts;
-    }
-
-    public void setScripts(ArrayList<AScript> scripts) {
-        this.scripts = scripts;
-    }
-
-    public ArrayList<APackage> getSendPackages() {
-        return sendPackages;
-    }
-
-    public void setSendPackages(ArrayList<APackage> sendPackages) {
-        this.sendPackages = sendPackages;
-    }
-
-    public void addSendPackage(APackage p){
-        this.sendPackages.add(p);
-    }
-
-    public ArrayList<APackage> getReceivePackages() {
-        return receivePackages;
-    }
-
-    public void setReceivePackages(ArrayList<APackage> receivePackages) {
-        this.receivePackages = receivePackages;
-    }
-
-    public void addReceivePackage(APackage p){
-        this.receivePackages.add(p);
-    }
-
+    /**
+     * Set this as a initiator process.
+     *
+     * @param initiator String
+     */
     public void setInitiator(String initiator) {
         this.initiator = initiator;
     }
 
+    /**
+     * Get process description.
+     *
+     * @return String
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Set process description.
+     *
+     * @param description String
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * See if this is a critical process.
+     *
+     * @return String
+     */
+    public String getCritical() {
+        return critical;
+    }
+
+    /**
+     * Set this is a critical process.
+     *
+     * @param critical String
+     */
     public void setCritical(String critical) {
         this.critical = critical;
     }
 
-
+    /**
+     * See if this is a sync process.
+     *
+     * @return String
+     */
     public String getSync() {
         return sync;
     }
 
+    /**
+     * Set this as a sync process.
+     *
+     * @param sync String
+     */
     public void setSync(String sync) {
         this.sync = sync;
     }
 
-    @Override
-    public String toString() {
-        return "AProcess{" +
-                "name='" + name + '\'' +
-                ", before='" + before + '\'' +
-                ", after='" + after + '\'' +
-                ", status='" + status + '\'' +
-                ", initiator='" + initiator + '\'' +
-                ", description='" + description + '\'' +
-                ", critical='" + critical + '\'' +
-                ", sync='" + sync + '\'' +
-                ", periodicity=" + periodicity +
-                ", delay=" + delay +
-                ", timeout=" + timeout +
-                ", requestid=" + requestid +
-                ", scripts=" + scripts +
-                ", sendPackages=" + sendPackages +
-                ", receivePackages=" + receivePackages +
-                '}';
+    /**
+     * Get periodicity of this process.
+     *
+     * @return int
+     */
+    public int getPeriodicity() {
+        return periodicity;
     }
+
+    /**
+     * Set periodicity of this process.
+     *
+     * @param periodicity int
+     */
+    public void setPeriodicity(int periodicity) {
+        this.periodicity = periodicity;
+    }
+
+    /**
+     * Get delay factor of this process.
+     *
+     * @return int
+     */
+    public int getDelay() {
+        return delay;
+    }
+
+    /**
+     * Set delay factor of this process.
+     *
+     * @param delay int
+     */
+    public void setDelay(int delay) {
+        this.delay = delay;
+    }
+
+    /**
+     * Get timeout for this process.
+     *
+     * @return int
+     */
+    public int getTimeout() {
+        return timeout;
+    }
+
+    /**
+     * Set timeout for this process.
+     *
+     * @param timeout int
+     */
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+    /**
+     * Get process request ID.
+     *
+     * @return int
+     */
+    public int getRequestid() {
+        return requestid;
+    }
+
+    /**
+     * Set process request ID.
+     *
+     * @param requestid int
+     */
+    public void setRequestid(int requestid) {
+        this.requestid = requestid;
+    }
+
+    /**
+     * Get list of external scripts attached to this process.
+     *
+     * @return List of AScript objects
+     */
+    public List<AScript> getScripts() {
+        return scripts;
+    }
+
+    /**
+     * Attach scripts to this process.
+     *
+     * @param scripts Lsit of AScript objects
+     */
+    public void setScripts(List<AScript> scripts) {
+        this.scripts = scripts;
+    }
+
+    /**
+     * Add a script to the process.
+     *
+     * @param script AScript object
+     */
+    public void addScript(AScript script) {
+        scripts.add(script);
+    }
+
+    /**
+     * Get list of send packages (pub-sub) of process.
+     *
+     * @return List of APackage objects
+     */
+    public List<APackage> getSendPackages() {
+        return sendPackages;
+    }
+
+    /**
+     * Set the list of send packages (pub-sub) of this process.
+     *
+     * @param sendPackages List of APackage objects
+     */
+    public void setSendPackages(List<APackage> sendPackages) {
+        this.sendPackages = sendPackages;
+    }
+
+    /**
+     * Add send package ( pub-sub) to the process.
+     *
+     * @param p APackage object
+     */
+    public void addSendPackage(APackage p) {
+        sendPackages.add(p);
+    }
+
+    /**
+     * Get list of received packages (pub-sub) of process.
+     *
+     * @return List of APackage objects
+     */
+    public List<APackage> getReceivePackages() {
+        return receivePackages;
+    }
+
+    /**
+     * Set the list of received packages (pub-sub) of this process.
+     *
+     * @param receivePackages List of APackage objects
+     */
+    public void setReceivePackages(List<APackage> receivePackages) {
+        this.receivePackages = receivePackages;
+    }
+
+    /**
+     * Add receive package ( pub-sub) to the process.
+     *
+     * @param p APackage object
+     */
+    public void addReceivePackage(APackage p) {
+        receivePackages.add(p);
+    }
+
 }

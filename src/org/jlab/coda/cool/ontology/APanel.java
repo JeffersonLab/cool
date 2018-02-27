@@ -1,64 +1,57 @@
-/*
- *   Copyright (c) 2017.  Jefferson Lab (JLab). All rights reserved. Permission
- *   to use, copy, modify, and distribute  this software and its documentation for
- *   governmental use, educational, research, and not-for-profit purposes, without
- *   fee and without a signed licensing agreement.
- *
- *   IN NO EVENT SHALL JLAB BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL
- *   INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
- *   OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF JLAB HAS
- *   BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *   JLAB SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- *   THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- *   PURPOSE. THE CLARA SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY,
- *   PROVIDED HEREUNDER IS PROVIDED "AS IS". JLAB HAS NO OBLIGATION TO PROVIDE
- *   MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *   This software was developed under the United States Government license.
- *   For more information contact author at gurjyan@jlab.org
- *   Department of Experimental Nuclear Physics, Jefferson Lab.
- */
 
 package org.jlab.coda.cool.ontology;
 
 
-import org.jlab.coda.cool.util.AConstants;
+import org.jlab.coda.cool.util.CoolConstants;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * COOL ontology concept: Graphical panel.
+ *
+ * @author gurjyan
+ *         Date: 02.27.18
+ * @version 4.x
+ */
 public class APanel extends AOntologyConcept implements Serializable, Cloneable {
     private String name;
     private String description;
     private String color;
     private String title;
-    private ArrayList<AWidget> widgets = new ArrayList<AWidget>();
     private int number;
+    private List<AWidget> widgets = new ArrayList<>();
 
-    public APanel(){
-         // this is a concept of org.jlab.coda.afecs.cool.ontology
-         setOntology("afecs");
-         // the name of the concept
-         setConceptName("Panel");
-         // slot hasName
-         addPrimitiveSlot( "hasName",1,true,"String");
-         // slot hasColor
-         addPrimitiveSlot( "hasColor",1,false,"String");
-         addPrimitiveSlot( "hasDescription",1,false,"String");
-         // slot hasTitle
-         addPrimitiveSlot( "hasTitle",1,false,"String");
-         // slot hasNumber
-         addPrimitiveSlot( "hasNumber",1,false,"String");
-         // slot widget
-         addConceptSlot( "hasWidget",2,false,"AWidget");
-     }
+    /**
+     * Constructor.
+     */
+    public APanel() {
+        // this is a concept of org.jlab.coda.afecs.cool.ontology
+        setOntology("afecs");
+        // the name of the concept
+        setConceptName("Panel");
+        // slot hasName
+        addPrimitiveSlot("hasName", 1, true, "String");
+        // slot hasColor
+        addPrimitiveSlot("hasColor", 1, false, "String");
+        addPrimitiveSlot("hasDescription", 1, false, "String");
+        // slot hasTitle
+        addPrimitiveSlot("hasTitle", 1, false, "String");
+        // slot hasNumber
+        addPrimitiveSlot("hasNumber", 1, false, "String");
+        // slot widget
+        addConceptSlot("hasWidget", 2, false, "AWidget");
+    }
 
+    @Override
     protected Object clone() throws CloneNotSupportedException {
         try {
             super.clone();
         } catch (CloneNotSupportedException e) {
-            if(AConstants.debug.get()) e.printStackTrace();
+            if (CoolConstants.debug.get()) {
+                e.printStackTrace();
+            }
         }
         APanel b = new APanel();
         b.setName(getName());
@@ -68,45 +61,116 @@ public class APanel extends AOntologyConcept implements Serializable, Cloneable 
         return b;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    /**
+     * Set panel name.
+     *
+     * @param name String
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Get description.
+     *
+     * @return String
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Set description.
+     *
+     * @param description String
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
+    /**
+     * Get color.
+     *
+     * @return String
+     */
     public String getColor() {
         return color;
     }
 
+    /**
+     * Set color.
+     *
+     * @param color String
+     */
     public void setColor(String color) {
         this.color = color;
     }
 
+    /**
+     * Get title.
+     *
+     * @return String
+     */
+    public String getTitle() {
+        return title;
+    }
 
+    /**
+     * Set title.
+     *
+     * @param title String
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * Get run number.
+     *
+     * @return int
+     */
     public int getNumber() {
         return number;
     }
 
+    /**
+     * Set run number.
+     *
+     * @param number int
+     */
     public void setNumber(int number) {
         this.number = number;
     }
 
-    public void setWidgets(ArrayList<AWidget> widgets) {
+    /**
+     * Get widgets of this panel.
+     *
+     * @return Lint of AWidget objects
+     */
+    public List<AWidget> getWidgets() {
+        return widgets;
+    }
+
+    /**
+     * Set widgets.
+     *
+     * @param widgets List of AWidget objects
+     */
+    public void setWidgets(List<AWidget> widgets) {
         this.widgets = widgets;
     }
 
+    /**
+     * Add widget.
+     *
+     * @param w AWidget object
+     */
+    public void addWidget(AWidget w) {
+        widgets.add(w);
+    }
 }
