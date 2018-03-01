@@ -44,7 +44,7 @@ public class AControl extends AOntologyConcept implements Serializable, Cloneabl
             super.clone();
         } catch (CloneNotSupportedException e) {
             System.out.println(e.getMessage());
-            if (CoolConstants.debug.get()) {
+            if (CoolConstants.DEBUG.get()) {
                 e.printStackTrace();
             }
         }

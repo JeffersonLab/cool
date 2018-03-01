@@ -162,7 +162,7 @@ public class CCompiler {
 
 
     /**
-     * Finds AND or OR boolean operators (& |).
+     * Finds AND or OR boolean operators.
      *
      * @param s input string of a condition
      * @return map containing key = index of the operator and value = operator

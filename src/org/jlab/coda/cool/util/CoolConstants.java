@@ -19,7 +19,7 @@ public final class CoolConstants {
     /**
      * Debug flag.
      */
-    public static AtomicBoolean debug = new AtomicBoolean();
+    public static final AtomicBoolean DEBUG = new AtomicBoolean();
 
     /**
      * Constant undefined.

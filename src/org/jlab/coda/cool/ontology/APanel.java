@@ -49,7 +49,7 @@ public class APanel extends AOntologyConcept implements Serializable, Cloneable 
         try {
             super.clone();
         } catch (CloneNotSupportedException e) {
-            if (CoolConstants.debug.get()) {
+            if (CoolConstants.DEBUG.get()) {
                 e.printStackTrace();
             }
         }

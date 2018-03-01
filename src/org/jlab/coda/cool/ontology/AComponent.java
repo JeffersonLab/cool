@@ -713,4 +713,18 @@ public class AComponent extends AOntologyConcept implements Serializable, Compar
         int comparedPriority = comp.getPriority();
         return priority - comparedPriority;
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof AComponent) {
+            return compareTo((AComponent) obj) == 0;
+        } else {
+            return false;
+        }
+    }
 }

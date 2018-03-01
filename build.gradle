@@ -8,8 +8,8 @@ plugins {
     id 'eclipse'
     id 'idea'
 }
-group = 'org.jlab.clara.clas12'
-archivesBaseName = 'org.jlab.clara.clas-clara-engine'
+group = 'org.jlab.coda'
+archivesBaseName = 'cool'
 version = '1.0-SNAPSHOT'
 
 defaultTasks 'build'
@@ -35,9 +35,6 @@ sourceSets {
 }
 
 repositories {
-    maven {
-        url 'http://clasweb.jlab.org/clas12maven/'
-    }
     mavenCentral()
 }
 
@@ -56,7 +53,7 @@ javadoc {
     options.encoding = 'utf8'
     options.docEncoding = 'utf8'
 
-    include "org/jlab/clara/clas/engine/**"
+    include "org/jlab/coda/cool/**"
 }
 
 task javadocJar(type: Jar) {
@@ -92,28 +89,17 @@ uploadArchives {
 }
 
 def deploySpec = copySpec {
-    into ('plugins/clas12/lib/org.jlab.clara.clas') {
+    into ('common/jar') {
+        from configurations.runtime
         from jar.archivePath
     }
 
-    from ('scripts/unix') {
-        into 'bin'
-        exclude 'etc'
-        fileMode 0755
-    }
-
-    from ('scripts/lib') {
-        into 'lib/clara'
-        fileMode 0755
-    }
-
-    // trick Gradle to "create" empy directories
-    def tempDir = "${buildDir}/distributions/clara_home"
-
-    file("${tempDir}/log").mkdirs()
-    file("${tempDir}/plugins").mkdirs()
-
-    from tempDir
+    // trick Gradle to "create" empty directories
+//    def tempDir = "${buildDir}/distributions/coda"
+//
+//    file("${tempDir}/common/jar").mkdirs()
+//
+//    from tempDir
 }
 
 task distSources(type: Tar, dependsOn: build) {
@@ -140,14 +126,14 @@ task distSources(type: Tar, dependsOn: build) {
 }
 
 task deploy(type: Copy, overwrite: true, dependsOn: jar) {
-    def dest = "$System.env.CLARA_HOME"
+    def dest = "$System.env.CODA"
 
     into dest
     with deploySpec
 
     doFirst {
         if (dest == 'null') {
-            throw new GradleException('CLARA_HOME not set')
+            throw new GradleException('CODA not set')
         }
     }
 }

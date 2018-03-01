@@ -29,6 +29,6 @@
 '/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/parser/AStatement.java'
 '/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/parser/CCompiler.java'
 '/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/parser/CParser.java'
-'/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/util/AConstants.java'
 '/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/util/CodaTypes.java'
-'/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/util/CTool.java'
+'/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/util/CoolConstants.java'
+'/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/util/CoolTools.java'

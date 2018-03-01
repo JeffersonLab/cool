@@ -45,9 +45,7 @@
 <file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/parser/CCompiler.java">
 </file>
 <file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/parser/CParser.java">
-<error line="1" severity="warning" message="File length is 2,067 lines (max allowed is 2,000)." source="com.puppycrawl.tools.checkstyle.checks.sizes.FileLengthCheck"/>
-<error line="467" column="5" severity="warning" message="Method length is 288 lines (max allowed is 150)." source="com.puppycrawl.tools.checkstyle.checks.sizes.MethodLengthCheck"/>
-<error line="1465" severity="warning" message="Line has trailing spaces." source="com.puppycrawl.tools.checkstyle.checks.regexp.RegexpSinglelineCheck"/>
+<error line="425" column="5" severity="warning" message="Method length is 228 lines (max allowed is 150)." source="com.puppycrawl.tools.checkstyle.checks.sizes.MethodLengthCheck"/>
 </file>
 <file name="/Users/gurjyan/Devel/daq/afecs-4.0/cool/src/org/jlab/coda/cool/util/CodaTypes.java">
 </file>
