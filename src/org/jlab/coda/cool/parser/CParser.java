@@ -499,7 +499,7 @@ public final class CParser {
                 }
                 tmps = getValue(x.toString(), "hasID");
                 if (tmps != null) {
-                    cmp.setId(Integer.valueOf(tmps));
+                    cmp.setId(Integer.parseInt(tmps));
                 }
                 tmps = getValue(x.toString(), "hasDescription");
                 if (tmps != null) {
@@ -519,7 +519,7 @@ public final class CParser {
                 }
                 tmps = getValue(x.toString(), "hasPriority");
                 if (tmps != null) {
-                    cmp.setPriority(Integer.valueOf(tmps));
+                    cmp.setPriority(Integer.parseInt(tmps));
                 } else {
                     if (cmp.getType().equalsIgnoreCase(CodaTypes.USR.name())) {
                         cmp.setPriority(CodaTypes.USR.priority());
@@ -600,7 +600,7 @@ public final class CParser {
                 }
                 tmps = getValue(x.toString(), "hasReportingInterval");
                 if (tmps != null) {
-                    cmp.setReportingInterval(Integer.valueOf(tmps));
+                    cmp.setReportingInterval(Integer.parseInt(tmps));
                 }
                 stateList = parseStates(x.toString(), "hasState");
                 if (stateList != null && !stateList.isEmpty()) {
@@ -624,19 +624,19 @@ public final class CParser {
                 }
                 tmps = getValue(x.toString(), "XCo");
                 if (tmps != null) {
-                    cmp.setX(Double.valueOf(tmps));
+                    cmp.setX(Double.parseDouble(tmps));
                 }
                 tmps = getValue(x.toString(), "YCo");
                 if (tmps != null) {
-                    cmp.setY(Double.valueOf(tmps));
+                    cmp.setY(Double.parseDouble(tmps));
                 }
                 tmps = getValue(x.toString(), "WCo");
                 if (tmps != null) {
-                    cmp.setW(Double.valueOf(tmps));
+                    cmp.setW(Double.parseDouble(tmps));
                 }
                 tmps = getValue(x.toString(), "HCo");
                 if (tmps != null) {
-                    cmp.setH(Double.valueOf(tmps));
+                    cmp.setH(Double.parseDouble(tmps));
                 }
                 List<String> tmL = getValueList(x.toString(), "linkedTo");
                 if (tmL != null && !tmL.isEmpty()) {
@@ -1056,7 +1056,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "sourcePort");
                 if (tmps != null) {
                     try {
-                        link.setSourcePort(Integer.valueOf(tmps));
+                        link.setSourcePort(Integer.parseInt(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1072,7 +1072,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "destinationPort");
                 if (tmps != null) {
                     try {
-                        link.setDestinationPort(Integer.valueOf(tmps));
+                        link.setDestinationPort(Integer.parseInt(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1080,7 +1080,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "destinationETNumberEvents");
                 if (tmps != null) {
                     try {
-                        link.setDestinationETNumberEvents(Integer.valueOf(tmps));
+                        link.setDestinationETNumberEvents(Integer.parseInt(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1088,7 +1088,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "destinationETEventSize");
                 if (tmps != null) {
                     try {
-                        link.setDestinationETEventSize(Integer.valueOf(tmps));
+                        link.setDestinationETEventSize(Integer.parseInt(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1096,7 +1096,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "startX");
                 if (tmps != null) {
                     try {
-                        link.setStartX(Double.valueOf(tmps));
+                        link.setStartX(Double.parseDouble(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1104,7 +1104,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "startY");
                 if (tmps != null) {
                     try {
-                        link.setStartY(Double.valueOf(tmps));
+                        link.setStartY(Double.parseDouble(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1112,7 +1112,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "endX");
                 if (tmps != null) {
                     try {
-                        link.setEndX(Double.valueOf(tmps));
+                        link.setEndX(Double.parseDouble(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1120,7 +1120,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "endY");
                 if (tmps != null) {
                     try {
-                        link.setEndY(Double.valueOf(tmps));
+                        link.setEndY(Double.parseDouble(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1230,7 +1230,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "hasEventLimit");
                 if (tmps != null) {
                     try {
-                        option.setEventLimit(Integer.valueOf(tmps));
+                        option.setEventLimit(Integer.parseInt(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1238,7 +1238,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "hasDataLimit");
                 if (tmps != null) {
                     try {
-                        option.setDataLimit(Integer.valueOf(tmps));
+                        option.setDataLimit(Integer.parseInt(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1400,7 +1400,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "hasValueType");
                 if (tmps != null) {
                     try {
-                        ch.setValueType(Integer.valueOf(tmps));
+                        ch.setValueType(Integer.parseInt(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1490,7 +1490,7 @@ public final class CParser {
                 tmp = getValue(x.toString(), "hasExitCode");
                 if (tmp != null) {
                     try {
-                        sc.setExitCode(Integer.valueOf(tmp));
+                        sc.setExitCode(Integer.parseInt(tmp));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1502,7 +1502,7 @@ public final class CParser {
                 tmp = getValue(x.toString(), "hasTimeout");
                 if (tmp != null) {
                     try {
-                        sc.setTimeout(Integer.valueOf(tmp));
+                        sc.setTimeout(Integer.parseInt(tmp));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1567,7 +1567,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "hasRows");
                 if (tmps != null) {
                     try {
-                        h.setRowsNumber(Integer.valueOf(tmps));
+                        h.setRowsNumber(Integer.parseInt(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1575,7 +1575,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "hasColumns");
                 if (tmps != null) {
                     try {
-                        h.setColumnsNumber(Integer.valueOf(tmps));
+                        h.setColumnsNumber(Integer.parseInt(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1649,7 +1649,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "hasNumber");
                 if (tmps != null) {
                     try {
-                        p.setNumber(Integer.valueOf(tmps));
+                        p.setNumber(Integer.parseInt(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }
@@ -1725,7 +1725,7 @@ public final class CParser {
                 tmps = getValue(x.toString(), "hasNumber");
                 if (tmps != null) {
                     try {
-                        w.setNumber(Integer.valueOf(tmps));
+                        w.setNumber(Integer.parseInt(tmps));
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
                     }

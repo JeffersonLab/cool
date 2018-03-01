@@ -79,9 +79,8 @@ if (!hasProperty('localPublicationRepo')) {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: localPublicationRepo)
             configuration = configurations.deployerJars
-            repository(url: 'scpexe://jlabl1.jlab.org/group/org.jlab.clara.clas/www/clasweb/html/clas12maven') {
+            repository(url: 'scpexe://ifarm65.jlab.org/group/clas/www/clasweb/html/clas12maven') {
                 authentication(userName: 'clas12')
             }
         }
@@ -89,17 +88,8 @@ uploadArchives {
 }
 
 def deploySpec = copySpec {
-    into ('common/jar') {
         from configurations.runtime
         from jar.archivePath
-    }
-
-    // trick Gradle to "create" empty directories
-//    def tempDir = "${buildDir}/distributions/coda"
-//
-//    file("${tempDir}/common/jar").mkdirs()
-//
-//    from tempDir
 }
 
 task distSources(type: Tar, dependsOn: build) {
@@ -126,7 +116,7 @@ task distSources(type: Tar, dependsOn: build) {
 }
 
 task deploy(type: Copy, overwrite: true, dependsOn: jar) {
-    def dest = "$System.env.CODA"
+    def dest = "${System.env.CODA}/common/jar"
 
     into dest
     with deploySpec
